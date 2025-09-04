@@ -1,0 +1,80 @@
+import React, { useState } from "react";
+
+export default function TimeBudgeter() {
+  const [tasks, setTasks] = useState([{ name: "", hours: 0 }]);
+
+  const handleTaskChange = (idx, key, value) => {
+    const newTasks = [...tasks];
+    newTasks[idx][key] = key === "hours" ? Number(value) : value;
+    setTasks(newTasks);
+  };
+
+  const addTask = () => {
+    setTasks([...tasks, { name: "", hours: 0 }]);
+  };
+
+  const totalHours = tasks.reduce((sum, t) => sum + t.hours, 0);
+
+  const percentage = (hours) =>
+    totalHours > 0 ? Math.round((hours / totalHours) * 100) : 0;
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <h1 className="text-2xl font-bold text-center mb-6">Time Budgeter</h1>
+
+      <div className="space-y-4">
+        {tasks.map((t, idx) => (
+          <div key={idx} className="bg-white p-4 rounded shadow flex gap-4">
+            <input
+              value={t.name}
+              onChange={(e) =>
+                handleTaskChange(idx, "name", e.target.value)
+              }
+              placeholder="Task name"
+              className="border p-2 rounded flex-1"
+            />
+            <input
+              type="number"
+              value={t.hours}
+              onChange={(e) =>
+                handleTaskChange(idx, "hours", e.target.value)
+              }
+              placeholder="Hours"
+              className="border p-2 rounded w-24"
+            />
+          </div>
+        ))}
+      </div>
+
+      <button
+        onClick={addTask}
+        className="bg-black text-white px-4 py-2 rounded mt-4"
+      >
+        Add Task
+      </button>
+
+      <div className="mt-6 bg-white p-4 rounded shadow">
+        <p className="font-semibold">Total Hours: {totalHours} / 24</p>
+        {totalHours > 24 && (
+          <p className="text-red-500 text-sm">Over budget! Reduce hours.</p>
+        )}
+        <div className="mt-4">
+          {tasks.map((t, idx) => (
+            <div key={idx} className="mb-2">
+              <div className="flex justify-between">
+                <span>{t.name || "Unnamed"}</span>
+                <span>{percentage(t.hours)}%</span>
+              </div>
+              <div className="h-3 bg-gray-200 rounded">
+                <div
+                  className="h-3 bg-green-500 rounded"
+                  style={{ width: `${percentage(t.hours)}%` }}
+                ></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
